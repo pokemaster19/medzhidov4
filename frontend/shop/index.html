@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Интернет-магазин</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --primary-color: #d4af37; /* Золотой оттенок */
+      --secondary-color: #c0a080; /* Пастельный кофейный оттенок */
+      --background-color: #f5f5dc; /* Молочный фон (цвет "бледно-кофе с молоком") */
+      --text-color: #444;
+      --border-color: #dcdcdc;
+      --hover-color: #bfae9d;
+    }
+
+    body {
+      font-family: "Roboto", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      flex: 1;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 40px;
+    }
+
+    .category-section {
+      margin-bottom: 40px;
+      background: var(--background-color);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-title {
+      font-size: 24px;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .category-title::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: box-shadow 0.3s, transform 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+    }
+
+    .product-price {
+      color: var(--secondary-color);
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.9em;
+      flex: 1;
+    }
+
+    /* Стили чата */
+    .chat-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      background: var(--background-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      padding: 15px;
+      background: var(--secondary-color);
+      color: white;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-body {
+      padding: 15px;
+      flex: 1;
+      display: none;
+    }
+
+    .chat-body.collapsed {
+      display: block;
+    }
+
+    #chatMessages {
+      height: 250px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      padding-right: 10px;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 8px;
+      background: var(--background-color);
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .message.admin {
+      background: #e8f5e9;
+    }
+
+    .message small {
+      display: block;
+      color: #666;
+      margin-top: 5px;
+      font-size: 0.8em;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    #chatInput {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 8px 15px;
+      background: var(--secondary-color);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    button:hover {
+      background: var(--hover-color);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Каталог товаров</h1>
+    <div id="catalog"></div>
+  </div>
+
+  <!-- Чат -->
+  <div class="chat-container">
+    <div class="chat-header" onclick="toggleChat()">
+      <div>Чат поддержки</div>
+      <div id="chatToggleIcon">−</div>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div id="chatMessages"></div>
+      <div class="chat-input">
+        <input id="chatInput" placeholder="Ваше сообщение..." />
+        <button onclick="sendMessage()">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // WebSocket соединение
+    const ws = new WebSocket('ws://localhost:3001/chat');
+    const userType = 'customer';
+
+    // Состояние чата
+    let isChatCollapsed = false;
+
+    // Переключение видимости чата
+    function toggleChat() {
+      const chatBody = document.getElementById('chatBody');
+      const toggleIcon = document.getElementById('chatToggleIcon');
+      isChatCollapsed = !isChatCollapsed;
+      chatBody.classList.toggle('collapsed', isChatCollapsed);
+      toggleIcon.textContent = isChatCollapsed ? '+' : '−';
+    }
+
+    // Обработчик сообщений
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'history') {
+        data.data.forEach(addMessageToUI);
+      } else if (data.type === 'message') {
+        addMessageToUI(data.data);
+      }
+    };
+
+    // Отправка сообщения
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (message) {
+        ws.send(JSON.stringify({
+          user: userType,
+          text: message
+        }));
+        input.value = '';
+      }
+    }
+
+    // Добавление сообщения в интерфейс
+    function addMessageToUI(msg) {
+      const messagesDiv = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      
+      messageDiv.className = `message ${msg.user}`;
+      messageDiv.innerHTML = `
+        <div><strong>${msg.user === 'customer' ? 'Вы' : 'Поддержка'}:</strong></div>
+        <div>${msg.text}</div>
+        <small>${new Date(msg.timestamp).toLocaleTimeString()}</small>
+      `;
+
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // GraphQL запрос товаров
+    async function loadProducts() {
+      const query = `
+        query {
+          products(fields: ["name", "price", "description", "category"]) {
+            name
+            price
+            description
+            category
+          }
+        }
+      `;
+
+      try {
+        const response = await fetch('/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+
+        const { data, errors } = await response.json();
+        
+        if (errors) {
+          console.error('Ошибка GraphQL:', errors);
+          return;
+        }
+
+        renderProducts(data.products);
+      } catch (error) {
+        console.error('Ошибка загрузки товаров:', error);
+      }
+    }
+
+    // Отрисовка товаров по категориям
+    function renderProducts(products) {
+      const catalog = document.getElementById('catalog');
+      catalog.innerHTML = '';
+
+      // Группировка по категориям
+      const grouped = products.reduce((acc, product) => {
+        product.category.forEach(cat => {
+          if (!acc[cat]) acc[cat] = [];
+          acc[cat].push(product);
+        });
+        return acc;
+      }, {});
+
+      // Создание секций
+      Object.entries(grouped).forEach(([category, items]) => {
+        const section = document.createElement('div');
+        section.className = 'category-section';
+        
+        const title = document.createElement('h2');
+        title.className = 'category-title';
+        title.textContent = category;
+        
+        const grid = document.createElement('div');
+        grid.className = 'products-grid';
+
+        items.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <div class="product-price">${product.price.toLocaleString()} ₽</div>
+            ${product.description ? `<div class="product-description">${product.description}</div>` : ''}
+          `;
+          grid.appendChild(card);
+        });
+
+        section.appendChild(title);
+        section.appendChild(grid);
+        catalog.appendChild(section);
+      });
+    }
+
+    // Инициализация
+    loadProducts();
+  </script>
+</body>
+</html>
