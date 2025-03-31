@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: Admin API
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      summary: Получить все товары
+      responses:
+        '200':
+          description: Список товаров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      summary: Добавить новый товар
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Товар создан
+  /products/{id}:
+    get:
+      summary: Получить товар по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные товара
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    put:
+      summary: Обновить товар
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Товар обновлен
+    delete:
+      summary: Удалить товар
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Товар удален
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - price
+        - description
+        - category
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          example: Новый товар
+        price:
+          type: number
+          example: 999.99
+        description:
+          type: string
+          example: Подробное описание
+        category:
+          type: array
+          items:
+            type: string
+          example: ["Категория 1", "Категория 2"]
